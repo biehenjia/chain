@@ -16,7 +16,7 @@ namespace chains {
     inline bool is_trig_kind(Kind k) {
         return k == Kind::Sin || k == Kind::Cos || k == Kind::Tan || k == Kind::Cot;
     }
-
+    
     /*
     Kind: 1B
     variable: 1B

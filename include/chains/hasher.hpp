@@ -11,9 +11,9 @@ namespace chains {
         return a ^ (b + 0x9e3779b9u + (a << 6) + (a >> 2));
     }
 
-    // leaf: hash over kind, variable, and the symbolic id
-    inline uint32_t hash_leaf(uint8_t var, uint32_t sym_id) {
-        return hmix(hmix(uint32_t(Kind::Leaf), var), sym_id);
+    // leaf: hash over kind and the symbolic id (leaves carry no variable)
+    inline uint32_t hash_leaf(uint32_t sym_id) {
+        return hmix(uint32_t(Kind::Leaf), sym_id);
     }
 
     // algebraic n-ary: hash over kind, variable, and each child's hash in order

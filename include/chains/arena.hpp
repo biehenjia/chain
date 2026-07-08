@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <span>
+#include <optional>
 #include <unordered_map>
 #include <chains/node.hpp>
 #include <chains/hasher.hpp>
@@ -12,16 +13,19 @@ namespace chains {
 
 class Arena {
     public:
-        static constexpr uint32_t INVALID = 0xFFFFFFFFu;
-
+        /**
+        attempts to insert a new symbolic object (by construction via CRnum algebraic rules) and returns id to an equivalent of that node
+        */
         uint32_t push_symbolic(Symbolic s) {
-            // compute the symbolic hash
+            // compute symbolic hash at expression level
             SymEngine::hash_t h = s->hash(); 
             auto range = symbolic_intern_.equal_range(h);
 
             // equality check
             for (auto it = range.first; it != range.second; ++it) {
-                if (SymEngine::eq(*symbolics_[it->second], *s)) return it->second;
+                if (SymEngine::eq(*symbolics_[it->second], *s)) {
+                    return it->second;
+                }
             }
 
             uint32_t id = uint32_t(symbolics_.size());
@@ -34,31 +38,43 @@ class Arena {
             return symbolics_[id];
         }
 
-        uint32_t push_leaf(uint8_t var, uint32_t sym_id) {
-            uint32_t h = hash_leaf(var, sym_id);
+        uint32_t push_leaf(uint32_t sym_id) {
+            uint32_t h = hash_leaf(sym_id);
+
             auto range = intern_.equal_range(h);
             for (auto it = range.first; it != range.second; ++it) {
                 const Node& e = nodes_[it->second];
-                if (e.kind == Kind::Leaf && e.variable == var && e.slot_a == sym_id) return it->second;
+                if (e.kind == Kind::Leaf && e.slot_a == sym_id) {
+                    return it->second;
+                }
             }
-            return commit(Node{Kind::Leaf, var, 0, sym_id, 0, h});
+
+            return commit(Node{Kind::Leaf, 0, 0, sym_id, 0, h});
         }
 
         uint32_t intern_algebraic(Kind k, uint8_t var, std::span<const uint32_t> ops) {
             uint32_t h = hash_algebraic(k, var, child_hashes(ops));
-            if (uint32_t id = lookup(k, var, h, ops); id != INVALID) return id;
+
+            if (auto id = lookup(k, var, h, ops)) return *id;
+
             uint32_t opstart = append_operands(ops);
             suffix_hashes_.resize(operands_.size(), 0);
-            return commit(Node{k, var, 0, opstart, uint32_t(ops.size()), h});
+            auto n = Node{k, var, 0, opstart, uint32_t(ops.size()), h};
+            return commit(n);
         }
 
         uint32_t intern_chain(Kind k, uint8_t var, std::span<const uint32_t> ops) {
             std::vector<uint32_t> chs = child_hashes(ops);
             ChainHash ch = hash_chain(k, var, chs);
-            if (uint32_t id = lookup(k, var, ch.head, ops); id != INVALID) return id;
+
+            if (auto id = lookup(k, var, ch.head, ops)) {
+                return *id;
+            }
+
             uint32_t opstart = append_operands(ops);
             suffix_hashes_.insert(suffix_hashes_.end(), ch.suffixes.begin(), ch.suffixes.end());
-            return commit(Node{k, var, 0, opstart, uint32_t(ops.size()), ch.head});
+            auto n = Node{k, var, 0, opstart, uint32_t(ops.size()), ch.head};
+            return commit(n);
         }
 
         const Node& node(uint32_t id) const { return nodes_[id]; }
@@ -73,37 +89,57 @@ class Arena {
         }
 
         uint32_t suffix_hash_at(uint32_t op_index) const { return suffix_hashes_[op_index]; }
-
         uint32_t num_nodes() const { return uint32_t(nodes_.size()); }
 
     private:
-        uint32_t lookup(Kind k, uint8_t var, uint32_t h, std::span<const uint32_t> ops) const {
+        
+
+        // determines if a description of a node exists within the interning table already, returns false on absence
+        std::optional<uint32_t> lookup(Kind k, uint8_t var, uint32_t h, std::span<const uint32_t> ops) const {
             auto range = intern_.equal_range(h);
             for (auto it = range.first; it != range.second; ++it) {
+
                 const Node& n = nodes_[it->second];
-                if (n.kind != k || n.variable != var || n.slot_b != ops.size()) continue;
+
+                if (n.kind != k || n.variable != var || n.slot_b != ops.size()) {
+                    continue;
+                }
+                
+                // perform node id checks, by above interning variant that node ids are equal iff they have the same contents
                 bool eq = true;
                 for (uint32_t i = 0; i < ops.size(); ++i) {
-                    if (operands_[n.slot_a + i] != ops[i]) { eq = false; break; }
+                    if (operands_[n.slot_a + i] != ops[i]) { 
+                        eq = false; 
+                        break; 
+                    }
                 }
-                if (eq) return it->second;
+                if (eq) {
+                    return it->second;
+                }
             }
-            return INVALID;
+            return std::nullopt;
         }
 
+        // insertion protocol for nodes; pointer moves node struct and creates id:node_index key value pairing
+        // returns index of inserted node 
         uint32_t commit(Node n) {
             uint32_t id = uint32_t(nodes_.size());
             nodes_.push_back(n);
             intern_.emplace(n.hash, id);
             return id;
         }
-
+        
+        // returns mapped hash of a slice
         std::vector<uint32_t> child_hashes(std::span<const uint32_t> ops) const {
             std::vector<uint32_t> out(ops.size());
-            for (size_t i = 0; i < ops.size(); ++i) out[i] = nodes_[ops[i]].hash;
+
+            for (size_t i = 0; i < ops.size(); ++i) {
+                out[i] = nodes_[ops[i]].hash;
+            }
             return out;
         }
-
+        
+        // n-ary operand appending into operands_ vector; returns insertion point
         uint32_t append_operands(std::span<const uint32_t> ops) {
             uint32_t opstart = uint32_t(operands_.size());
             operands_.insert(operands_.end(), ops.begin(), ops.end());
