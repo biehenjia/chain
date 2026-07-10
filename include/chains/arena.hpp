@@ -3,13 +3,21 @@
 #include <span>
 #include <optional>
 #include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <chains/node.hpp>
 #include <chains/hasher.hpp>
 #include <symengine/basic.h>
+#include <symengine/integer.h>
 
 using Symbolic = SymEngine::RCP<const SymEngine::Basic>;
 
 namespace chains {
+
+class Arena;
+
+std::optional<uint32_t> simplify_chain(Arena& a, Kind k, uint8_t var, std::span<const uint32_t> ops);
+std::optional<uint32_t> simplify_algebraic(Arena& a, Kind k, uint8_t var, std::span<const uint32_t> ops);
 
 class Arena {
     public:
@@ -53,17 +61,21 @@ class Arena {
         }
 
         uint32_t intern_algebraic(Kind k, uint8_t var, std::span<const uint32_t> ops) {
-            uint32_t h = hash_algebraic(k, var, child_hashes(ops));
+            if (auto s = simplify_algebraic(*this, k, var, ops)) return *s;
+            std::vector<uint32_t> chs = child_hashes(ops);
+            uint32_t h = hash_algebraic(k, var, chs);
 
             if (auto id = lookup(k, var, h, ops)) return *id;
 
             uint32_t opstart = append_operands(ops);
             suffix_hashes_.resize(operands_.size(), 0);
-            auto n = Node{k, var, 0, opstart, uint32_t(ops.size()), h};
+            uint32_t oplen = uint32_t(ops.size());
+            auto n = Node{k, var, 0, opstart, oplen, h};
             return commit(n);
         }
 
         uint32_t intern_chain(Kind k, uint8_t var, std::span<const uint32_t> ops) {
+            if (auto s = simplify_chain(*this, k, var, ops)) return *s;
             std::vector<uint32_t> chs = child_hashes(ops);
             ChainHash ch = hash_chain(k, var, chs);
 
@@ -73,8 +85,24 @@ class Arena {
 
             uint32_t opstart = append_operands(ops);
             suffix_hashes_.insert(suffix_hashes_.end(), ch.suffixes.begin(), ch.suffixes.end());
-            auto n = Node{k, var, 0, opstart, uint32_t(ops.size()), ch.head};
+            uint32_t oplen = uint32_t(ops.size());
+            auto n = Node{k, var, 0, opstart, oplen, ch.head};
             return commit(n);
+        }
+
+        // Interns a Connector node referring to (origin, offset) — used only by prepare.
+        // Variable mirrors the origin's variable so shift dispatch sees the right axis.
+        uint32_t intern_connector(uint32_t origin, uint32_t offset) {
+            uint32_t h = hash_connector(origin, offset);
+            auto range = intern_.equal_range(h);
+            for (auto it = range.first; it != range.second; ++it) {
+                const Node& e = nodes_[it->second];
+                if (e.kind == Kind::Connector && e.slot_a == origin && e.slot_b == offset) {
+                    return it->second;
+                }
+            }
+            uint8_t var = nodes_[origin].variable;
+            return commit(Node{Kind::Connector, var, 0, origin, offset, h});
         }
 
         const Node& node(uint32_t id) const { return nodes_[id]; }
@@ -90,6 +118,19 @@ class Arena {
 
         uint32_t suffix_hash_at(uint32_t op_index) const { return suffix_hashes_[op_index]; }
         uint32_t num_nodes() const { return uint32_t(nodes_.size()); }
+        uint32_t operand_count() const { return uint32_t(operands_.size()); }
+
+        // lazy construction of consed zero and one leaves
+        std::pair<Arena, uint32_t> compact(uint32_t root) const;
+
+        uint32_t zero_leaf_id() {
+            if (!zero_leaf_id_) zero_leaf_id_ = push_leaf(push_symbolic(SymEngine::integer(0)));
+            return *zero_leaf_id_;
+        }
+        uint32_t one_leaf_id() {
+            if (!one_leaf_id_) one_leaf_id_ = push_leaf(push_symbolic(SymEngine::integer(1)));
+            return *one_leaf_id_;
+        }
 
     private:
         
@@ -139,6 +180,11 @@ class Arena {
             return out;
         }
         
+        // Post-order DFS from `root`, appending each reachable node id once. Post-order
+        // guarantees children appear before parents in `topo`, so the compact rewrite can
+        // remap operand ids in a single pass. Definition in src/arena.cpp.
+        void collect_live(uint32_t id, std::unordered_set<uint32_t>& live, std::vector<uint32_t>& topo) const;
+
         // n-ary operand appending into operands_ vector; returns insertion point
         uint32_t append_operands(std::span<const uint32_t> ops) {
             uint32_t opstart = uint32_t(operands_.size());
@@ -152,6 +198,8 @@ class Arena {
         std::vector<Symbolic> symbolics_;
         std::unordered_multimap<uint32_t, uint32_t> intern_;
         std::unordered_multimap<SymEngine::hash_t, uint32_t> symbolic_intern_;
+        std::optional<uint32_t> zero_leaf_id_;
+        std::optional<uint32_t> one_leaf_id_;
 };
 
 }

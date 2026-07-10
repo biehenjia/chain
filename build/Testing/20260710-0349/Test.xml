@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="(empty)"
+	BuildStamp="20260710-0349-Experimental"
+	Name="(empty)"
+	Generator="ctest-4.3.4"
+	CompilerName=""
+	CompilerVersion=""
+	OSName="macOS"
+	Hostname="jesses-MacBook-Air.local"
+	OSRelease="15.1"
+	OSVersion="24B83"
+	OSPlatform="arm64"
+	Is64Bits="1"
+	VendorString="Apple"
+	VendorID="Apple"
+	FamilyID="0"
+	ModelID="0"
+	ModelName="Apple M2"
+	ProcessorCacheSize="131072"
+	NumberOfLogicalCPU="8"
+	NumberOfPhysicalCPU="8"
+	TotalVirtualMemory="3072"
+	TotalPhysicalMemory="8192"
+	LogicalProcessorsPerPhysical="8"
+	ProcessorClockFrequency="0.000000"
+	>
+	<Testing>
+		<StartDateTime>Jul 09 23:49 EDT</StartDateTime>
+		<StartTestTime>1783655362</StartTestTime>
+		<TestList/>
+		<EndDateTime>Jul 09 23:49 EDT</EndDateTime>
+		<EndTestTime>1783655362</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>

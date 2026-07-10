@@ -11,6 +11,7 @@ namespace chains {
         Sum, Prod, Sin, Cos, Tan, Cot,
         // CRE* (algebraic n-ary, flat span of operand NodeIds)
         EAdd, EMul, EPow, ELog, ESin, ECos, ETan, ECot,
+        Connector,
     };
 
     inline bool is_trig_kind(Kind k) {

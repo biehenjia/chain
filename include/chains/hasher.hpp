@@ -16,6 +16,12 @@ namespace chains {
         return hmix(uint32_t(Kind::Leaf), sym_id);
     }
 
+    // connector: hash over kind, origin node id, and offset. Variable is redundant
+    // (it must match the origin's variable) so it stays out of the mix.
+    inline uint32_t hash_connector(uint32_t origin, uint32_t offset) {
+        return hmix(hmix(uint32_t(Kind::Connector), origin), offset);
+    }
+
     // algebraic n-ary: hash over kind, variable, and each child's hash in order
     inline uint32_t hash_algebraic(Kind k, uint8_t var, std::span<const uint32_t> child_hashes) {
 
@@ -46,9 +52,15 @@ namespace chains {
         uint32_t running = 0;
 
         for (int i = int(steps) - 1; i >= 0; --i) {
-            uint32_t child = trig ? hmix(child_hashes[i], child_hashes[i + stride]) : child_hashes[i];
+            uint32_t child;
+            if (trig) {
+                child = hmix(child_hashes[i], child_hashes[i + stride]);
+            } else {
+                child = child_hashes[i];
+            }
 
-            running = hmix(kseed, hmix(child, running));
+            uint32_t inner = hmix(child, running);
+            running = hmix(kseed, inner);
             suffixes[i] = running;
         }
         return {running, std::move(suffixes)};
