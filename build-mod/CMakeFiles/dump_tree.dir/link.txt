@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -flto=thin -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/dump_tree.dir/.scratch/dump_tree.cpp.o -o dump_tree  -Wl,-rpath,/opt/homebrew/lib libchains.a /opt/homebrew/lib/libsymengine.0.14.0.dylib /opt/homebrew/lib/libflint.dylib /opt/homebrew/lib/libmpc.dylib /opt/homebrew/lib/libmpfr.dylib /opt/homebrew/lib/libgmp.dylib

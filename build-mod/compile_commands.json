@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/Users/bhj/projects/active/chains/chains++/build-mod",
+  "command": "/usr/bin/c++  -I/Users/bhj/projects/active/chains/chains++/include -I/opt/homebrew/lib/cmake/symengine/../../../include -I/opt/homebrew/include/flint -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -flto=thin -arch arm64 -march=native -o CMakeFiles/chains.dir/src/algebra_impl.cpp.o -c /Users/bhj/projects/active/chains/chains++/src/algebra_impl.cpp",
+  "file": "/Users/bhj/projects/active/chains/chains++/src/algebra_impl.cpp",
+  "output": "CMakeFiles/chains.dir/src/algebra_impl.cpp.o"
+},
+{
+  "directory": "/Users/bhj/projects/active/chains/chains++/build-mod",
+  "command": "/usr/bin/c++  -I/Users/bhj/projects/active/chains/chains++/include -I/opt/homebrew/lib/cmake/symengine/../../../include -I/opt/homebrew/include/flint -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -flto=thin -arch arm64 -march=native -o CMakeFiles/module_smoke.dir/.scratch/module_smoke.cpp.o -c /Users/bhj/projects/active/chains/chains++/.scratch/module_smoke.cpp",
+  "file": "/Users/bhj/projects/active/chains/chains++/.scratch/module_smoke.cpp",
+  "output": "CMakeFiles/module_smoke.dir/.scratch/module_smoke.cpp.o"
+},
+{
+  "directory": "/Users/bhj/projects/active/chains/chains++/build-mod",
+  "command": "/usr/bin/c++  -I/Users/bhj/projects/active/chains/chains++/include -I/opt/homebrew/lib/cmake/symengine/../../../include -I/opt/homebrew/include/flint -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -flto=thin -arch arm64 -march=native -o CMakeFiles/materialize_smoke.dir/.scratch/materialize_smoke.cpp.o -c /Users/bhj/projects/active/chains/chains++/.scratch/materialize_smoke.cpp",
+  "file": "/Users/bhj/projects/active/chains/chains++/.scratch/materialize_smoke.cpp",
+  "output": "CMakeFiles/materialize_smoke.dir/.scratch/materialize_smoke.cpp.o"
+},
+{
+  "directory": "/Users/bhj/projects/active/chains/chains++/build-mod",
+  "command": "/usr/bin/c++  -I/Users/bhj/projects/active/chains/chains++/include -I/opt/homebrew/lib/cmake/symengine/../../../include -I/opt/homebrew/include/flint -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -flto=thin -arch arm64 -march=native -o CMakeFiles/cmcr_numeric.dir/.scratch/cmcr_numeric.cpp.o -c /Users/bhj/projects/active/chains/chains++/.scratch/cmcr_numeric.cpp",
+  "file": "/Users/bhj/projects/active/chains/chains++/.scratch/cmcr_numeric.cpp",
+  "output": "CMakeFiles/cmcr_numeric.dir/.scratch/cmcr_numeric.cpp.o"
+},
+{
+  "directory": "/Users/bhj/projects/active/chains/chains++/build-mod",
+  "command": "/usr/bin/c++  -I/Users/bhj/projects/active/chains/chains++/include -I/opt/homebrew/lib/cmake/symengine/../../../include -I/opt/homebrew/include/flint -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -flto=thin -arch arm64 -march=native -o CMakeFiles/dump_tree.dir/.scratch/dump_tree.cpp.o -c /Users/bhj/projects/active/chains/chains++/.scratch/dump_tree.cpp",
+  "file": "/Users/bhj/projects/active/chains/chains++/.scratch/dump_tree.cpp",
+  "output": "CMakeFiles/dump_tree.dir/.scratch/dump_tree.cpp.o"
+},
+{
+  "directory": "/Users/bhj/projects/active/chains/chains++/build-mod",
+  "command": "/usr/bin/c++  -I/Users/bhj/projects/active/chains/chains++/include -I/opt/homebrew/lib/cmake/symengine/../../../include -I/opt/homebrew/include/flint -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -flto=thin -arch arm64 -march=native -o CMakeFiles/sin_probe.dir/.scratch/sin_probe.cpp.o -c /Users/bhj/projects/active/chains/chains++/.scratch/sin_probe.cpp",
+  "file": "/Users/bhj/projects/active/chains/chains++/.scratch/sin_probe.cpp",
+  "output": "CMakeFiles/sin_probe.dir/.scratch/sin_probe.cpp.o"
+},
+{
+  "directory": "/Users/bhj/projects/active/chains/chains++/build-mod",
+  "command": "/usr/bin/c++  -I/Users/bhj/projects/active/chains/chains++/include -I/opt/homebrew/lib/cmake/symengine/../../../include -I/opt/homebrew/include/flint -isystem /opt/homebrew/include -O3 -DNDEBUG -std=c++20 -flto=thin -arch arm64 -march=native -o CMakeFiles/dump_tree_sym.dir/.scratch/dump_tree_sym.cpp.o -c /Users/bhj/projects/active/chains/chains++/.scratch/dump_tree_sym.cpp",
+  "file": "/Users/bhj/projects/active/chains/chains++/.scratch/dump_tree_sym.cpp",
+  "output": "CMakeFiles/dump_tree_sym.dir/.scratch/dump_tree_sym.cpp.o"
+}
+]

@@ -1,0 +1,2 @@
+"/usr/bin/ar" qc libchains.a CMakeFiles/chains.dir/src/algebra_impl.cpp.o
+"/usr/bin/ranlib" libchains.a
