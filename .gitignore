@@ -1,0 +1,7 @@
+.direnv/
+.home/
+.envrc
+
+# Local and generated files
+.DS_Store
+build/
