@@ -1,0 +1,1 @@
+Algebra and construction utilities for chains of recurrences.

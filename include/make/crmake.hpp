@@ -24,7 +24,7 @@
 
 #include "../algebra/router.hpp"
 
-namespace cr::build {
+namespace cr::make {
 
     class CRmake {
         public:

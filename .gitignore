@@ -5,3 +5,7 @@
 # Local and generated files
 .DS_Store
 build/
+
+# Local clangd translation unit; it only exists to generate a compilation
+# command for this header-only library.
+tools/lsp.cpp
